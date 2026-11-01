@@ -122,6 +122,21 @@ jobs:
               echo "=== DNS configuration ==="
               cat /etc/resolv.conf
             '
+      - name: Test DNS resolution
+        run: |
+          echo "=== GitHub runner DNS ==="
+          getent ahostsv4 archive.debian.org || true
+      
+          echo "=== Debian container DNS ==="
+          docker run --rm --platform linux/386 \
+            i386/debian:buster \
+            getent ahostsv4 archive.debian.org || true
+      
+          echo "=== Debian container without seccomp ==="
+          docker run --rm --platform linux/386 \
+            --security-opt seccomp=unconfined \
+            i386/debian:buster \
+            getent ahostsv4 archive.debian.org || true
       
       # Setting the IMAGE_NAME variable in GITHUB_ENV to <Dockerfile name>_<date>_<run_id>.ext2.
       - name: Generate the image_name.
