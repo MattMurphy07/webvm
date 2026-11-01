@@ -103,6 +103,26 @@ jobs:
       # Checks-out our repository under $GITHUB_WORKSPACE, so our job can access it
       - uses: actions/checkout@v4
 
+      - name: Inspect Debian build environment
+        run: |
+          docker run --rm --platform linux/386 \
+            --entrypoint /bin/sh i386/debian:buster -c '
+              echo "=== Shell ==="
+              ls -l /bin/sh
+      
+              echo "=== Debian release ==="
+              cat /etc/os-release
+      
+              echo "=== Archive keyring package ==="
+              dpkg-query -W debian-archive-keyring
+      
+              echo "=== Keyring files ==="
+              ls -lh /usr/share/keyrings/ /etc/apt/trusted.gpg.d/
+      
+              echo "=== DNS configuration ==="
+              cat /etc/resolv.conf
+            '
+      
       # Setting the IMAGE_NAME variable in GITHUB_ENV to <Dockerfile name>_<date>_<run_id>.ext2.
       - name: Generate the image_name.
         id: image_name_gen
